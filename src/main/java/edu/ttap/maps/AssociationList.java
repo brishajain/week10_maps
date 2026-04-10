@@ -118,9 +118,15 @@ public class AssociationList<K, V> implements Map<K, V> {
     public V put(K key, V value) {
         for(int i = 0; i < list.size(); i++) {
             if(list.get(i).key.equals(key)) {
-                list.add(i, key);
+                Pair<K,V> pair = list.get(i);
+                V oldvalue = pair.val;
+                pair.val = value;
+                return oldvalue;
             }
         }
+        Pair<K,V> newPair = new Pair<>(key, value);
+        list.add(newPair);
+        return null;
     }
 
     /**
@@ -131,8 +137,10 @@ public class AssociationList<K, V> implements Map<K, V> {
      */
     @Override
     public void putAll(Map<? extends K, ? extends V> m) {
-        // TODO: implement me!
-        throw new UnsupportedOperationException("Unimplemented method 'putAll'");
+        for(int i = 0; i < m.size(); i++) {
+            Pair<K,V> pair = list.get(i);
+            put(pair.key, pair.val);
+        }
     }
 
     /**
@@ -143,8 +151,14 @@ public class AssociationList<K, V> implements Map<K, V> {
      */
     @Override
     public V remove(Object key) {
-        // TODO: Implement me!
-        throw new UnsupportedOperationException("Unimplemented method 'remove'");
+        for(int i = 0; i < list.size(); i++) {
+            if(list.get(i).key.equals(key)) {
+                V value = list.get(i).val;
+                list.remove(i);
+                return value;
+            }
+        }
+        return null;
     }
 
     /**
@@ -156,11 +170,14 @@ public class AssociationList<K, V> implements Map<K, V> {
     }
 
     /**
-     * @return a collection vof the values contained in this map, e.g., a list
+     * @return a collection of the values contained in this map, e.g., a list
      */
     @Override
     public Collection<V> values() {
-        // TODO: Implement me!
-        throw new UnsupportedOperationException("Unimplemented method 'values'");
+        Collection<V> vals = new ArrayList<V>();
+        for(int i = 0; i < list.size(); i++) {
+            vals.add(list.get(i).val);
+        }
+        return vals;
     }
 }
