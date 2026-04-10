@@ -1,6 +1,10 @@
 package edu.ttap.maps;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 /**
  * A substitution cipher is a simple encryption scheme that associates each
@@ -14,10 +18,23 @@ public class SubstitutionCipher {
      * @param filename the name of the file containing the mapping
      * @return the cipher as a mapping between characters
      */
-    public static Map<Character, Character> createCipher(String filename) {
-        // TODO: implement me!
-        throw new UnsupportedOperationException("Unimplemented method 'createCipher'");
+    public static Map<Character, Character> createCipher(String filename) throws FileNotFoundException
+    {
+        Map<Character, Character> encodings = new HashMap<>();
+
+        Scanner scanner = new Scanner(new File(filename));
+        while (scanner.hasNextLine()) {
+                String keyStr = scanner.next();    
+                String valStr = scanner.next();    
+
+                char key = keyStr.charAt(0);
+                char value = valStr.charAt(0);
+
+                encodings.put(key, value);
     }
+    scanner.close();
+    return encodings;
+        }
 
     /**
      * Determines whether the given mapping is a valid substitution cipher. A cipher is
