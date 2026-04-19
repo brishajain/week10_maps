@@ -45,8 +45,29 @@ public class SubstitutionCipher {
      * @return true iff the given mapping is a valid substitution cipher
      */
     public static boolean isValidCipher(Map<Character, Character> cipher) {
-        // TODO: implement me!
-        throw new UnsupportedOperationException("Unimplemented method 'isValidCipher'");
+        if (cipher.size() != 26) {
+            return false;
+        }
+
+        for (char ch = 'a'; ch <= 'z'; ch++) {
+            if (!cipher.containsKey(ch)) {
+                return false;
+            }
+
+            char mapped = cipher.get(ch);
+            if (mapped < 'a' || mapped > 'z') {
+                return false;
+            }
+        }
+
+        for (char c1 = 'a'; c1 <= 'z'; c1++) {
+            for (char c2 = (char) (c1 + 1); c2 <= 'z'; c2++) {
+                if (cipher.get(c1).equals(cipher.get(c2))) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -57,8 +78,12 @@ public class SubstitutionCipher {
      * @return the inverse mapping of the given cipher
      */
     public static Map<Character, Character> invertCipher(Map<Character, Character> cipher) {
-        // TODO: implement me!
-        throw new UnsupportedOperationException("Unimplemented method 'invertCipher'");
+        Map<Character, Character> inverse = new AssociationList<>();
+
+        for (char ch = 'a'; ch <= 'z'; ch++) {
+            inverse.put(cipher.get(ch), ch);
+        }
+        return inverse;
     }
 
     /**
@@ -68,20 +93,61 @@ public class SubstitutionCipher {
      * @return the translated string
      */
     public static String translate(String s, Map<Character, Character> mapping) {
-        // TODO: implement me!
-        throw new UnsupportedOperationException("Unimplemented method 'translate'");
+        String result = "";
+
+        for (int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
+
+            if (mapping.containsKey(ch)) {
+                result += mapping.get(ch);
+            } else {
+                result += ch;
+            }
+        }
+        return result;
     }
 
     /**
      * The main driver for the substitution cipher program.
      * @param args the driver's command-line arguments
+     * @throws FileNotFoundException 
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
         if (args.length != 3) {
             System.err.println(
                 "Usage: java SubstitutionCipher <encode|decode> <cipherfile> <filename>");
             System.exit(1);
         }
-        // TODO: finish implementing me!
+        String mode = args[0];
+    String cipherFile = args[1];
+    String filename = args[2];
+
+    Map<Character, Character> cipher = createCipher(cipherFile);
+
+    if (!isValidCipher(cipher)) {
+        System.err.println("Invalid cipher.");
+        System.exit(1);
+    }
+
+    Map<Character, Character> mapping;
+
+    if (mode.equals("encode")) {
+        mapping = cipher;
+    } else if (mode.equals("decode")) {
+        mapping = invertCipher(cipher);
+    } else {
+        System.err.println("First argument must be encode or decode.");
+        System.exit(1);
+        return;
+    }
+
+    Scanner scanner = new Scanner(new File(filename));
+
+    while (scanner.hasNextLine()) {
+        String line = scanner.nextLine();
+        System.out.println(translate(line, mapping));
+    }
+
+    scanner.close();
     }
 }
