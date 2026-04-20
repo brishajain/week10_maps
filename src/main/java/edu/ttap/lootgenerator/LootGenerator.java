@@ -85,7 +85,6 @@ public class LootGenerator {
         Scanner file = new Scanner(new File(filename));
         
         while(file.hasNextLine()) {
-            //String fileline = file.nextLine();
             
             while (file.hasNext()) {
             String name = file.next();
@@ -125,8 +124,18 @@ public class LootGenerator {
     public Monster pickMonster(ArrayList<Monster> monsters) {
         int index = rand.nextInt(monsters.size());
         return monsters.get(index);
-
     }
+
+    public String pickItem(String treasureClass, HashMap<String, TreasureClass> treasureClasses) {
+        String current = treasureClass;
+        while(treasureClasses.containsKey(current)) {
+        TreasureClass tc = treasureClasses.get(current);
+        current = tc.randomDrop();
+    }
+    return current;
+    }
+
+    
 
 
     public static void main(String[] args) {
