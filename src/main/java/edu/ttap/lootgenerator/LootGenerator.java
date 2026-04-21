@@ -134,6 +134,57 @@ public class LootGenerator {
     return current;
     }
 
+    public HashMap<String, Armor> parseArmor(String filename)
+    throws FileNotFoundException {
+        Scanner file = new Scanner(new File(filename));
+        HashMap<String, Armor> Armors = new HashMap<>();
+
+        while(file.hasNextLine())
+        {
+            String line = file.nextLine().trim();
+            String[] parts= line.split("\t");
+            String name = parts[0];
+            int minac = Integer.parseInt(parts[1]);
+            int maxac = Integer.parseInt(parts[1]);
+
+            Armor a = new Armor(name, minac, maxac);
+            Armors.put(name, a); 
+        }
+        file.close();
+        return Armors;
+    }
+
+    public Armor generateBaseItem(String armorItem, HashMap<String, Armor> armorMap) {
+        return armorMap.get(armorItem);
+    }
+
+    public String generateBaseStats(Armor item) {
+        int val = rand.nextInt(item.maxac - item.minac + 1) + item.minac;
+        return "Defense: " + val;
+    }
+    
+    public ArrayList<Affix> parseAffixs(String filename) throws FileNotFoundException {
+        ArrayList<Affix> affixes = new ArrayList<>();
+        Scanner file = new Scanner(new File(filename));
+
+        while(file.hasNextLine())
+        {
+            String line = file.nextLine().trim();
+            String[] parts= line.split("\t");
+            String name = parts[0];
+            String mod1code = parts[1];
+            int mod1min = Integer.parseInt(parts[2]);
+            int mod1max = Integer.parseInt(parts[3]);
+
+            Affix newAffix = new Affix(name, mod1code, mod1min, mod1max);
+            affixes.add(newAffix); 
+        }
+        file.close();
+        return affixes;
+    }
+
+    
+
     public static void main(String[] args) {
         System.out.println("This program kills monsters and generates loot!");
         // TOOD: Implement me!
