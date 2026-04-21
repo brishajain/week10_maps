@@ -85,16 +85,15 @@ public class LootGenerator {
         Scanner file = new Scanner(new File(filename));
         
         while(file.hasNextLine()) {
-            
-            while (file.hasNext()) {
-            String name = file.next();
-            String type = file.next();
-            int level = file.nextInt();
-            String treasureClass = file.nextLine();
+            String line = file.nextLine().trim();
+            String[] parts = line.split("\t");
+            String name = parts[0];
+            String type = parts[1];
+            int level = Integer.parseInt(parts[2]);
+            String treasureClass = parts[3]; 
 
             Monster monster = new Monster(name, type, level, treasureClass);
             monsters.add(monster);
-        }
     }
     file.close();
     return monsters;
@@ -107,7 +106,7 @@ public class LootGenerator {
 
         while(file.hasNextLine())
         {
-            String line= file.nextLine().trim();
+            String line = file.nextLine().trim();
             String[] parts= line.split("\t");
             String treasure = parts[0];
             String item1 = parts[1];
@@ -117,7 +116,7 @@ public class LootGenerator {
             TreasureClass t = new TreasureClass(treasure, item1, item2, item3);
             treasureClasses.put(treasure, t); 
         }
-
+        file.close();
         return treasureClasses;
     }
 
@@ -126,7 +125,7 @@ public class LootGenerator {
         return monsters.get(index);
     }
 
-    public String pickItem(String treasureClass, HashMap<String, TreasureClass> treasureClasses) {
+    public String fetchTreasureClass(String treasureClass, HashMap<String, TreasureClass> treasureClasses) {
         String current = treasureClass;
         while(treasureClasses.containsKey(current)) {
         TreasureClass tc = treasureClasses.get(current);
@@ -134,9 +133,6 @@ public class LootGenerator {
     }
     return current;
     }
-
-    
-
 
     public static void main(String[] args) {
         System.out.println("This program kills monsters and generates loot!");
