@@ -4,7 +4,6 @@ package edu.ttap.lootgenerator;
  * A piece of armor with a defense range that gets
  * rolled randomly between a min and max value.
  */
-
 public class Armor {
     String name;
 
