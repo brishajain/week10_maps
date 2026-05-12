@@ -2,6 +2,8 @@ package edu.ttap.intmaps;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
@@ -116,5 +118,132 @@ public class IntegerMaps {
 
         System.out.println();
         return chars.size();
+    }
+
+    /*
+ * Part 3: The Letter Counter
+ *
+ * The method from part 1 only worked for the English alphabet because it used
+ * an array of length 26.
+ *
+ * To count all characters, this part creates a LetterCounter class. It uses an
+ * array, but each position in the array stores a list. The character is sent
+ * to an index by using mod. If two characters land in the same position, both
+ * are stored in the list at that position.
+ *
+ * This allows the program to count many different characters, not just a-z.
+ */
+    static class Pair {
+
+        char key;
+
+        int value;
+
+        public Pair(char key, int value) {
+            this.key = key;
+            this.value = value;
+        }
+    }
+
+    static class LetterCounter {
+        List<Pair>[] table;
+
+        @SuppressWarnings("unchecked")
+        public LetterCounter() {
+            table = (List<Pair>[]) new List[100];
+
+            for (int i = 0; i < table.length; i++) {
+                table[i] = new ArrayList<Pair>();
+            }
+        }
+
+        public boolean hasKey(char ch) {
+            int index = ch % table.length;
+
+            for (int i = 0; i < table[index].size(); i++) {
+                if (table[index].get(i).key == ch) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public void put(char ch, int v) {
+            int index = ch % table.length;
+
+            for (int i = 0; i < table[index].size(); i++) {
+                if (table[index].get(i).key == ch) {
+                    table[index].get(i).value = v;
+                    return;
+                }
+            }
+
+            table[index].add(new Pair(ch, v));
+        }
+
+        public int get(char ch) {
+            int index = ch % table.length;
+
+            for (int i = 0; i < table[index].size(); i++) {
+                if (table[index].get(i).key == ch) {
+                    return table[index].get(i).value;
+                }
+            }
+
+            throw new IllegalArgumentException("No entry for character");
+        }
+    }
+
+    /**
+     * Reports the counts of all characters in the file.
+     *
+     * @param path the file path
+     * @throws FileNotFoundException if the file cannot be opened
+     */
+    public static void reportAllCounts(String path) throws FileNotFoundException {
+        LetterCounter counts = new LetterCounter();
+        Set<Character> chars = new TreeSet<Character>();
+        Scanner input = new Scanner(new File(path));
+
+        while (input.hasNextLine()) {
+            String line = input.nextLine();
+
+            for (int i = 0; i < line.length(); i++) {
+                char ch = line.charAt(i);
+                chars.add(ch);
+
+                if (counts.hasKey(ch)) {
+                    counts.put(ch, counts.get(ch) + 1);
+                } else {
+                    counts.put(ch, 1);
+                }
+            }
+
+            chars.add('\n');
+            if (counts.hasKey('\n')) {
+                counts.put('\n', counts.get('\n') + 1);
+            } else {
+                counts.put('\n', 1);
+            }
+        }
+
+        input.close();
+
+        Character[] charArray = chars.toArray(new Character[0]);
+
+        for (int i = 0; i < charArray.length; i++) {
+            char ch = charArray[i];
+
+            if (ch == '\n') {
+                System.out.println("'\\n': " + counts.get(ch));
+            } else if (ch == '\t') {
+                System.out.println("'\\t': " + counts.get(ch));
+            } else if (ch == ' ') {
+                System.out.println("' ': " + counts.get(ch));
+            } else {
+                System.out.println(ch + ": " + counts.get(ch));
+            }
+        }
     }
 }
