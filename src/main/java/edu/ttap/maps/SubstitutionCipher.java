@@ -12,35 +12,41 @@ import java.util.Scanner;
  */
 public class SubstitutionCipher {
     /**
-     * Creates a substitution cipher by reading a mapping of characters from the given
-     * file. Each mapping of the file should be of the form "a b", where 'a' is mapped to
-     * 'b' in the cipher. We require 
+     * Creates a substitution cipher by reading a mapping of characters from the
+     * given
+     * file. Each mapping of the file should be of the form "a b", where 'a' is
+     * mapped to
+     * 'b' in the cipher. We require
+     * 
      * @param filename the name of the file containing the mapping
      * @return the cipher as a mapping between characters
      */
-    public static Map<Character, Character> createCipher(String filename) throws FileNotFoundException
-    {
+    public static Map<Character, Character> createCipher(String filename)
+            throws FileNotFoundException {
         Map<Character, Character> encodings = new HashMap<>();
 
         Scanner scanner = new Scanner(new File(filename));
         while (scanner.hasNextLine()) {
-                String keyStr = scanner.next();    
-                String valStr = scanner.next();    
+            String keyStr = scanner.next();
+            String valStr = scanner.next();
+            char key = keyStr.charAt(0);
+            char value = valStr.charAt(0);
 
-                char key = keyStr.charAt(0);
-                char value = valStr.charAt(0);
-
-                encodings.put(key, value);
-    }
-    scanner.close();
-    return encodings;
+            encodings.put(key, value);
         }
+        scanner.close();
+        return encodings;
+    }
 
     /**
-     * Determines whether the given mapping is a valid substitution cipher. A cipher is
-     * valid if (a) it maps every letter of the alphabet (a–z) and (b) it is a bijection,
-     * i.e., no two letters map to the same letter (so that we can roundtrip encode/decode
+     * Determines whether the given mapping is a valid substitution cipher. A cipher
+     * is
+     * valid if (a) it maps every letter of the alphabet (a–z) and (b) it is a
+     * bijection,
+     * i.e., no two letters map to the same letter (so that we can roundtrip
+     * encode/decode
      * a message without loss of fidelity).
+     * 
      * @param cipher
      * @return true iff the given mapping is a valid substitution cipher
      */
@@ -74,6 +80,7 @@ public class SubstitutionCipher {
      * Given a valid substitution cipher, produces the inverse mapping, which
      * can be used to decode the encoded massage. For example, if the cipher
      * maps 'a' to 'b', then the inverse mapping should map 'b' to 'a'.
+     * 
      * @param cipher the cipher to invert
      * @return the inverse mapping of the given cipher
      */
@@ -88,7 +95,8 @@ public class SubstitutionCipher {
 
     /**
      * Translates the given string using the provided mapping.
-     * @param s the string to translate
+     * 
+     * @param s       the string to translate
      * @param mapping the mapping to use
      * @return the translated string
      */
@@ -109,45 +117,47 @@ public class SubstitutionCipher {
 
     /**
      * The main driver for the substitution cipher program.
+     * 
      * @param args the driver's command-line arguments
-     * @throws FileNotFoundException 
+     * @throws FileNotFoundException
      */
     public static void main(String[] args) throws FileNotFoundException {
         if (args.length != 3) {
             System.err.println(
-                "Usage: java SubstitutionCipher <encode|decode> <cipherfile> <filename>");
+                    "Usage: java SubstitutionCipher <encode|decode> <cipherfile> <filename>");
             System.exit(1);
         }
         String mode = args[0];
-    String cipherFile = args[1];
-    String filename = args[2];
 
-    Map<Character, Character> cipher = createCipher(cipherFile);
+        String cipherFile = args[1];
 
-    if (!isValidCipher(cipher)) {
-        System.err.println("Invalid cipher.");
-        System.exit(1);
-    }
+        String filename = args[2];
 
-    Map<Character, Character> mapping;
+        Map<Character, Character> cipher = createCipher(cipherFile);
+        if (!isValidCipher(cipher)) {
+            System.err.println("Invalid cipher.");
+            System.exit(1);
+        }
 
-    if (mode.equals("encode")) {
-        mapping = cipher;
-    } else if (mode.equals("decode")) {
-        mapping = invertCipher(cipher);
-    } else {
-        System.err.println("First argument must be encode or decode.");
-        System.exit(1);
-        return;
-    }
+        Map<Character, Character> mapping;
 
-    Scanner scanner = new Scanner(new File(filename));
+        if (mode.equals("encode")) {
+            mapping = cipher;
+        } else if (mode.equals("decode")) {
+            mapping = invertCipher(cipher);
+        } else {
+            System.err.println("First argument must be encode or decode.");
+            System.exit(1);
+            return;
+        }
 
-    while (scanner.hasNextLine()) {
-        String line = scanner.nextLine();
-        System.out.println(translate(line, mapping));
-    }
+        Scanner scanner = new Scanner(new File(filename));
 
-    scanner.close();
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            System.out.println(translate(line, mapping));
+        }
+
+        scanner.close();
     }
 }

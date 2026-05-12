@@ -1,6 +1,6 @@
-# (_TODO: fill in the title of this assignment here!_)
+# Project 7: Loot Generator
 
-Authors: (_TODO: fill in your names here!_)
+Authors: Juan Diego Carpio, Brisha Jain
 
 ## Build commands
 
@@ -10,6 +10,6 @@ Authors: (_TODO: fill in your names here!_)
 
 ## Resources
 
-*   (_TODO: fill in resources here!_)
-*   ...
-*   ...
+*   https://osera.cs.grinnell.edu/ttap/data-structures-labs/loot-generator.html
+*   https://osera.cs.grinnell.edu/ttap/data-structures-labs/applying-integer-maps.html
+*   https://osera.cs.grinnell.edu/ttap/data-structures-labs/maps.html
