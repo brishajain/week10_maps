@@ -1,26 +1,48 @@
 package edu.ttap.lootgenerator;
 
 /**
- * A piece of armor with a defense range that gets
- * rolled randomly between a min and max value.
+ * Represents one armor item.
  */
 public class Armor {
-    String name;
+    private final String name;
 
-    int minac;
+    private final int minac;
 
-    int maxac;
+    private final int maxac;
 
     /**
-     * Creates an armor piece with its name and defense range.
-     * 
-     * @param name  the armor's name
-     * @param minac the lowest possible defense roll
-     * @param maxac the highest possible defense roll
+     * Constructs an Armor with name and min/max armor class values.
+     * @param name the name of the armor
+     * @param minac the minimum armor class
+     * @param maxac the maximum armor class
      */
     public Armor(String name, int minac, int maxac) {
         this.name = name;
         this.minac = minac;
         this.maxac = maxac;
+    }
+
+    /**
+     * Returns the name of this armor.
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Returns the minimum armor class of this armor.
+     * @return the minimum armor class
+     */
+    public int getMinac() {
+        return minac;
+    }
+
+    /**
+     * Returns the maximum armor class of this armor.
+     * @return the maximum armor class
+     */
+    public int getMaxac() {
+        return maxac;
     }
 }

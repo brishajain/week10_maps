@@ -1,30 +1,60 @@
 package edu.ttap.lootgenerator;
 
 /**
- * A modifier affix that gets slapped onto an item,
- * like strength. Has a stat code and a roll range.
+ * Represents one prefix or suffix affix.
  */
 public class Affix {
-    String name;
+    private final String name;
 
-    String modCode;
+    private final String modCode;
 
-    int modMin;
+    private final int modMin;
 
-    int modMax;
+    private final int modMax;
 
     /**
-     * Creates an affix with its name, what it modifies, and how much.
-     * 
-     * @param name    the display name of the affix
-     * @param modCode code for what stat it affects
-     * @param modMin  the minimum value of the modifier
-     * @param modMax  the maximum value of the modifier
+     * Constructs an Affix with name, mod code, and min/max mod values.
+     * @param name the name of the affix
+     * @param modCode the modification code
+     * @param modMin the minimum modification value
+     * @param modMax the maximum modification value
      */
     public Affix(String name, String modCode, int modMin, int modMax) {
         this.name = name;
         this.modCode = modCode;
         this.modMin = modMin;
         this.modMax = modMax;
+    }
+
+    /**
+     * Returns the name of this affix.
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Returns the mod code of this affix.
+     * @return the mod code
+     */
+    public String getModCode() {
+        return modCode;
+    }
+
+    /**
+     * Returns the minimum mod value of this affix.
+     * @return the minimum mod value
+     */
+    public int getModMin() {
+        return modMin;
+    }
+
+    /**
+     * Returns the maximum mod value of this affix.
+     * @return the maximum mod value
+     */
+    public int getModMax() {
+        return modMax;
     }
 }

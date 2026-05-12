@@ -1,30 +1,60 @@
 package edu.ttap.lootgenerator;
 
 /**
- * Monster class that can be killed for a loot and holds
- * a name, type, level and treasure class.
+ * Represents one monster.
  */
 public class Monster {
-    String name;
+    private final String name;
 
-    String type;
+    private final String type;
 
-    int level;
+    private final int level;
 
-    String treasureClass;
+    private final String treasureClass;
 
     /**
-     * Represents the monster class with all parameters
-     * 
-     * @param name          The name of the monster
-     * @param type          The type of the monster
-     * @param level         The level of the monster
-     * @param treasureClass The trasure class of the moster
+     * Constructs a Monster with name, type, level, and treasure class.
+     * @param name the name of the monster
+     * @param type the type of the monster
+     * @param level the level of the monster
+     * @param treasureClass the treasure class
      */
     public Monster(String name, String type, int level, String treasureClass) {
         this.name = name;
         this.type = type;
         this.level = level;
         this.treasureClass = treasureClass;
+    }
+
+    /**
+     * Returns the name of this monster.
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Returns the type of this monster.
+     * @return the type
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * Returns the level of this monster.
+     * @return the level
+     */
+    public int getLevel() {
+        return level;
+    }
+
+    /**
+     * Returns the treasure class of this monster.
+     * @return the treasure class
+     */
+    public String getTreasureClass() {
+        return treasureClass;
     }
 }

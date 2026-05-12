@@ -1,4 +1,4 @@
-package edu.ttap;
+package edu.ttap.intmaps;
 
 import java.io.File;
 import java.io.FileNotFoundException;

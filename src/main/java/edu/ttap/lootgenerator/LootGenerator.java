@@ -4,191 +4,305 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 
 /**
- * Main loot generator class that reads in monsters, treasure classes,
- * armor, and affixes from data files, then uses them to simulate
- * killing a monster and dropping loot.
+ * Generates random loot from monster, treasure, armor, and affix data.
  */
 public class LootGenerator {
-    /** The path to the dataset (either the small or large set). */
-    private static final String DATA_SET = "data/small";
+    private static final String DEFAULT_DATA_SET = "data/small";
 
-    private static final Random rand = new Random();
+    private static final Random RAND = new Random();
 
     /**
-     * Reads the monsters file and returns a list of all monsters.
-     * Each line in the file should be tab-separated with name, type, level, and
-     * treasure class.
-     * 
-     * @param filename path to the monsters data file
-     * @return a list of all the monsters we loaded
-     * @throws FileNotFoundException if the file doesn't exist
+     * Parses monsters from a file.
+     * @param filename the file path to read from
+     * @return a list of parsed monsters
+     * @throws FileNotFoundException if the file is not found
      */
-    public ArrayList<Monster> parseMonsters(String filename) throws FileNotFoundException {
-        ArrayList<Monster> monsters = new ArrayList<>();
+    public List<Monster> parseMonsters(String filename)
+            throws FileNotFoundException {
+        List<Monster> monsters = new ArrayList<>();
         Scanner file = new Scanner(new File(filename));
 
         while (file.hasNextLine()) {
             String line = file.nextLine().trim();
-            String[] parts = line.split("\t");
-            String name = parts[0];
-            String type = parts[1];
-            int level = Integer.parseInt(parts[2]);
-            String treasureClass = parts[3];
 
-            Monster monster = new Monster(name, type, level, treasureClass);
-            monsters.add(monster);
+            if (line.length() == 0 || line.startsWith("Class")) {
+                continue;
+            }
+
+            String[] parts = line.split("\t");
+            if (parts.length >= 4) {
+                monsters.add(new Monster(parts[0], parts[1],
+                        Integer.parseInt(parts[2]), parts[3]));
+            }
         }
+
         file.close();
         return monsters;
     }
 
     /**
-     * Reads the treasure class file and returns a map of all treasure classes.
-     * The map key is the treasure class name, which makes lookups easy later.
-     * 
-     * @param filename path to the treasure class data file
-     * @return a map from treasure class name to TreasureClass object
-     * @throws FileNotFoundException if the file doesn't exist
+     * Parses treasure classes from a file.
+     * @param filename the file path to read from
+     * @return a map of treasure classes keyed by name
+     * @throws FileNotFoundException if the file is not found
      */
-    public HashMap<String, TreasureClass> parseTreasue(String filename)
+    public Map<String, TreasureClass> parseTreasureClasses(String filename)
             throws FileNotFoundException {
+        Map<String, TreasureClass> treasureClasses = new HashMap<>();
         Scanner file = new Scanner(new File(filename));
-        HashMap<String, TreasureClass> treasureClasses = new HashMap<>();
 
         while (file.hasNextLine()) {
             String line = file.nextLine().trim();
-            String[] parts = line.split("\t");
-            String treasure = parts[0];
-            String item1 = parts[1];
-            String item2 = parts[2];
-            String item3 = parts[3];
 
-            TreasureClass t = new TreasureClass(treasure, item1, item2, item3);
-            treasureClasses.put(treasure, t);
+            if (line.length() == 0 || line.startsWith("Treasure Class")) {
+                continue;
+            }
+
+            String[] parts = line.split("\t");
+            if (parts.length >= 4) {
+                TreasureClass treasureClass = new TreasureClass(parts[0],
+                        parts[1], parts[2], parts[3]);
+                treasureClasses.put(parts[0], treasureClass);
+            }
         }
+
         file.close();
         return treasureClasses;
     }
 
     /**
-     * Picks a random monster from the list. Every monster has an equal chance.
-     * 
-     * @param monsters the full list of monsters to pick from
-     * @return the monster that got randomly selected
+     * Parses armor from a file.
+     * @param filename the file path to read from
+     * @return a map of armor items keyed by name
+     * @throws FileNotFoundException if the file is not found
      */
-    public Monster pickMonster(ArrayList<Monster> monsters) {
-        int index = rand.nextInt(monsters.size());
-        return monsters.get(index);
-    }
-
-    /**
-     * Follows the treasure class chain until we land on an actual item name.
-     * Treasure classes can point to other treasure classes, so we keep rolling
-     * until we hit something that isn't in the map.
-     * 
-     * @param treasureClass   the starting treasure class name
-     * @param treasureClasses the full map of all treasure classes
-     * @return the name of the final item that dropped
-     */
-    public String fetchTreasureClass(String treasureClass,
-            HashMap<String, TreasureClass> treasureClasses) {
-        String current = treasureClass;
-        while (treasureClasses.containsKey(current)) {
-            TreasureClass tc = treasureClasses.get(current);
-            current = tc.randomDrop();
-        }
-        return current;
-    }
-
-    /**
-     * Reads the armor file and returns a map of all armor pieces.
-     * 
-     * @param filename path to the armor data file
-     * @return a map from armor name to Armor object
-     * @throws FileNotFoundException if the file doesn't exist
-     */
-    public HashMap<String, Armor> parseArmor(String filename)
+    public Map<String, Armor> parseArmor(String filename)
             throws FileNotFoundException {
-
+        Map<String, Armor> armorMap = new HashMap<>();
         Scanner file = new Scanner(new File(filename));
-
-        HashMap<String, Armor> armors = new HashMap<>();
 
         while (file.hasNextLine()) {
             String line = file.nextLine().trim();
-            String[] parts = line.split("\t");
-            String name = parts[0];
-            int minac = Integer.parseInt(parts[1]);
-            int maxac = Integer.parseInt(parts[2]);
 
-            Armor a = new Armor(name, minac, maxac);
-            armors.put(name, a);
+            if (line.length() == 0 || line.startsWith("name")) {
+                continue;
+            }
+
+            String[] parts = line.split("\t");
+            if (parts.length >= 3) {
+                armorMap.put(parts[0], new Armor(parts[0],
+                        Integer.parseInt(parts[1]),
+                        Integer.parseInt(parts[2])));
+            }
         }
+
         file.close();
-        return armors;
+        return armorMap;
     }
 
     /**
-     * Looks up an armor piece by name and returns it as the base item.
-     * Returns null if it doesn't find it
-     * 
-     * @param armorItem the name of the armor to look up
-     * @param armorMap  the full map of armor pieces
-     * @return the matching Armor object, or null if not found
+     * Parses affixes from a file.
+     * @param filename the file path to read from
+     * @return a list of parsed affixes
+     * @throws FileNotFoundException if the file is not found
      */
-    public Armor generateBaseItem(String armorItem, HashMap<String, Armor> armorMap) {
-        return armorMap.get(armorItem);
-    }
-
-    /**
-     * Rolls a random defense value for the given armor within its range
-     * 
-     * @param item the armor piece to roll stats for
-     * @return a string of the Defense plus value
-     */
-    public String generateBaseStats(Armor item) {
-        int val = rand.nextInt(item.maxac - item.minac + 1) + item.minac;
-        return "Defense: " + val;
-    }
-
-    /**
-     * Reads the affixes file and returns a list of all affixes.
-     * 
-     * @param filename path to the affixes data file
-     * @return a list of all the affixes we loaded
-     * @throws FileNotFoundException if the file doesn't exist
-     */
-    public ArrayList<Affix> parseAffixs(String filename) throws FileNotFoundException {
-        ArrayList<Affix> affixes = new ArrayList<>();
+    public List<Affix> parseAffixes(String filename)
+            throws FileNotFoundException {
+        List<Affix> affixes = new ArrayList<>();
         Scanner file = new Scanner(new File(filename));
 
         while (file.hasNextLine()) {
             String line = file.nextLine().trim();
-            String[] parts = line.split("\t");
-            String name = parts[0];
-            String mod1code = parts[1];
-            int mod1min = Integer.parseInt(parts[2]);
-            int mod1max = Integer.parseInt(parts[3]);
 
-            Affix newAffix = new Affix(name, mod1code, mod1min, mod1max);
-            affixes.add(newAffix);
+            if (line.length() == 0 || line.startsWith("Name")) {
+                continue;
+            }
+
+            String[] parts = line.split("\t");
+            if (parts.length >= 4) {
+                affixes.add(new Affix(parts[0], parts[1],
+                        Integer.parseInt(parts[2]),
+                        Integer.parseInt(parts[3])));
+            }
         }
+
         file.close();
         return affixes;
     }
 
     /**
-     * The entry point. Eventually this should pick a monster, kill it,
-     * roll some loot, and print out what dropped. For now it's just a stub.
-     * 
-     * @param args Command lines
+     * Picks a random monster from the list.
+     * @param monsters the list of monsters to choose from
+     * @return a randomly selected monster
      */
-    public static void main(String[] args) {
-        System.out.println("This program kills monsters and generates loot!");
-        // TOOD: Implement me!
+    public Monster pickMonster(List<Monster> monsters) {
+        return monsters.get(RAND.nextInt(monsters.size()));
+    }
+
+    /**
+     * Generates a base item name by following the treasure class chain.
+     * @param treasureClass the starting treasure class
+     * @param treasureClasses the map of all treasure classes
+     * @return the generated base item name
+     */
+    public String generateBaseItem(String treasureClass,
+            Map<String, TreasureClass> treasureClasses) {
+        String current = treasureClass;
+
+        while (treasureClasses.containsKey(current)) {
+            current = treasureClasses.get(current).randomDrop(RAND);
+        }
+
+        return current;
+    }
+
+    /**
+     * Generates base stats for an armor item.
+     * @param armor the armor to generate stats for
+     * @return the defense stat as a string
+     */
+    public String generateBaseStats(Armor armor) {
+        int value = randomBetween(armor.getMinac(), armor.getMaxac());
+        return "Defense: " + value;
+    }
+
+    /**
+     * Generates a random affix or returns null.
+     * @param affixes the list of affixes to choose from
+     * @return a randomly selected affix or null
+     */
+    public Affix generateAffix(List<Affix> affixes) {
+        if (affixes.size() == 0) {
+            return null;
+        }
+
+        if (RAND.nextBoolean()) {
+            return affixes.get(RAND.nextInt(affixes.size()));
+        }
+
+        return null;
+    }
+
+    /**
+     * Generates stats for an affix.
+     * @param affix the affix to generate stats for
+     * @return the affix stat as a string
+     */
+    public String generateAffixStat(Affix affix) {
+        int value = randomBetween(affix.getModMin(), affix.getModMax());
+        return value + " " + affix.getModCode();
+    }
+
+    /**
+     * Plays one round of loot generation and displays the result.
+     * @param monsters the list of monsters
+     * @param treasureClasses the map of treasure classes
+     * @param armorMap the map of armor items
+     * @param prefixes the list of prefix affixes
+     * @param suffixes the list of suffix affixes
+     */
+    public void playRound(List<Monster> monsters,
+            Map<String, TreasureClass> treasureClasses,
+            Map<String, Armor> armorMap,
+            List<Affix> prefixes,
+            List<Affix> suffixes) {
+        Monster monster = pickMonster(monsters);
+        String baseItemName = generateBaseItem(monster.getTreasureClass(),
+                treasureClasses);
+        Armor armor = armorMap.get(baseItemName);
+
+        if (armor == null) {
+            throw new IllegalArgumentException("Unknown armor: "
+                    + baseItemName);
+        }
+
+        Affix prefix = generateAffix(prefixes);
+        Affix suffix = generateAffix(suffixes);
+
+        String itemName = armor.getName();
+
+        if (prefix != null) {
+            itemName = prefix.getName() + " " + itemName;
+        }
+
+        if (suffix != null) {
+            itemName = itemName + " " + suffix.getName();
+        }
+
+        System.out.println("Fighting " + monster.getName() + "...");
+        System.out.println("You have slain " + monster.getName() + "!");
+        System.out.println(monster.getName() + " dropped:");
+        System.out.println();
+        System.out.println(itemName);
+        System.out.println(generateBaseStats(armor));
+
+        if (prefix != null) {
+            System.out.println(generateAffixStat(prefix));
+        }
+
+        if (suffix != null) {
+            System.out.println(generateAffixStat(suffix));
+        }
+    }
+
+    /**
+     * Returns a random integer between min and max (inclusive).
+     * @param min the minimum value
+     * @param max the maximum value
+     * @return a random integer in the range
+     */
+    private static int randomBetween(int min, int max) {
+        return RAND.nextInt(max - min + 1) + min;
+    }
+
+    /**
+     * Main method to run the loot generator.
+     * @param args optional command line arguments
+     * @throws FileNotFoundException if a data file is not found
+     */
+    public static void main(String[] args) throws FileNotFoundException {
+        String dataSet = DEFAULT_DATA_SET;
+
+        if (args.length > 0) {
+            dataSet = args[0];
+        }
+
+        LootGenerator generator = new LootGenerator();
+
+        List<Monster> monsters = generator.parseMonsters(dataSet
+                + "/monstats.txt");
+        Map<String, TreasureClass> treasureClasses =
+                generator.parseTreasureClasses(dataSet
+                        + "/TreasureClassEx.txt");
+        Map<String, Armor> armorMap = generator.parseArmor(dataSet
+                + "/armor.txt");
+        List<Affix> prefixes = generator.parseAffixes(dataSet
+                + "/MagicPrefix.txt");
+        List<Affix> suffixes = generator.parseAffixes(dataSet
+                + "/MagicSuffix.txt");
+
+        Scanner input = new Scanner(System.in);
+        boolean fighting = true;
+
+        while (fighting) {
+            generator.playRound(monsters, treasureClasses, armorMap,
+                    prefixes, suffixes);
+
+            String answer = "";
+            while (!answer.equals("y") && !answer.equals("n")) {
+                System.out.print("Fight again [y/n]? ");
+                answer = input.nextLine().trim().toLowerCase();
+            }
+
+            fighting = answer.equals("y");
+        }
+
+        input.close();
     }
 }
